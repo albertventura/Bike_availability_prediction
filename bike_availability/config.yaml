@@ -1,0 +1,20 @@
+deployment: 'local'
+
+preprocessing:
+  bicing_cols: 
+    - 'station_id'
+    - 'last_reported'
+    - 'num_bikes_available'
+    - 'is_installed'
+    - 'is_renting'
+  station_cols:
+    - 'station_id'
+    - 'name'
+    - 'lat'
+    - 'lon'
+    - 'capacity'
+    - 'altitude'
+  use_meteo_data: True
+  fetch_data: True
+  save_file: True
+  output_name: bicing_dataset.csv
