@@ -169,5 +169,6 @@ mlartifacts
 mlruns
 myenv
 logs
+datasets
 #for now
 Notebooks
