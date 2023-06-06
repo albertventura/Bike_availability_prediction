@@ -163,4 +163,11 @@ data/meteo_data/*
 data/raw_data/*
 data/submission_data/*
 bike_availability/datasets/*
-
+capstonevenv
+plots
+mlartifacts
+mlruns
+myenv
+logs
+#for now
+Notebooks
