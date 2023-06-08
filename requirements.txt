@@ -15,4 +15,7 @@ tzdata==2023.3
 urllib3==2.0.2
 scikit-learn==1.2.2
 mlflow==2.3.2
+xgboost==1.7.5
+fastapi==0.96.0
+uvicorn==0.22.0
 -e .

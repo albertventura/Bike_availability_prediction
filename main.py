@@ -1,5 +1,9 @@
-from bike_availability.data_manager.data_manager import DataManager
-from bike_availability import preprocessing_pipeline
+from fastapi import FastAPI
 
-if __name__ == '__main__':
-    print('Hello World')
+app = FastAPI()
+
+@app.get("/")
+async def root():
+    return {"message":"Hello lads"}
+
+   

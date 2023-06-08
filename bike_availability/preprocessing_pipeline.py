@@ -74,8 +74,19 @@ class ProcessingPipeline:
         return merged_data
     
 
-    def preprocess_meteo_data(self, files_path: str) -> pd.DataFrame:
-        pass 
+    def merge_meteo_data(self, data:pd.DataFrame, train:bool = True) -> pd.DataFrame:
+        logger.info("Merging meteo data")
+        if train:
+            meteo_data = data_manager.read_csv(self.data_paths['meteo_data_train'])
+        else:
+            meteo_data = data_manager.read_csv(self.data_paths['meteo_data_test'])
+        meteo_data = meteo_data[self.pipeline_config['meteo_cols']]
+
+        return data.merge(meteo_data, on = ['year', 'month', 'day', 'hour'], how = 'inner')
+
+    def process_test_data(self, data:pd.DataFrame):
+        data['year'] = 2023
+        return data
 
     def execute(self) -> pd.DataFrame:
         """
@@ -106,15 +117,34 @@ class ProcessingPipeline:
         logger.info('filtering stations')
         df_bicing_processed = df_bicing_processed[df_bicing_processed.station_id.isin(stations_to_use)]
 
+        if self.pipeline_config['use_test']:
+            logger.info('Processing submission data')
+            df_sub = data_manager.read_csv(self.data_paths['submission_data'])
+            print(df_sub)
+            df_sub_processed = self.process_test_data(df_sub)
+            print(df_sub_processed)
+            logger.info('Merging station data for submission data')
+            df_sub_processed = self.merge_station_data(df_sub_processed, not_sub=False)
+
         if self.pipeline_config['use_meteo_data']:
-            #meteosteps would go here
-            #...
-            pass
+            df_bicing_processed = self.merge_meteo_data(df_bicing_processed)
+            if self.pipeline_config['use_test']:
+                logger.info('Merging meteo data for submission data')
+                df_sub_processed = self.merge_meteo_data(df_sub_processed, train = False)
 
         if self.pipeline_config['save_file']:
-            logger.info('saving processed data to file')
-            data_manager.save_data(self.data_paths['processed_data'], self.pipeline_config['output_name'], df_bicing_processed)
-
+            logger.info('saving processed train data to file')
+            data_manager.save_data(
+                self.data_paths['processed_data'],
+                self.pipeline_config['output_name_train'],
+                df_bicing_processed)
+            
+            if self.pipeline_config['use_test']:
+                logger.info('Saving processed submission data to file')
+                data_manager.save_data(
+                    self.data_paths['processed_data'],
+                    self.pipeline_config['output_name_sub'],
+                    df_sub_processed)
         return df_bicing_processed
 
 

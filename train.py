@@ -16,7 +16,7 @@ if conf.get_config('pipeline')['preprocess']:
     df = processor.execute()
 else:
     logger.info("Skipping processing steps, reading dataset directly")
-    df = data_manager.read_csv('./datasets/bicing_dataset.csv')
+    df = data_manager.read_csv(conf.get_config('data_paths')['clean_train_dataset'])
 
 if conf.get_config('pipeline')['train']:
     logger.info("Starting Model Trainer: ")

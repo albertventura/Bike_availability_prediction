@@ -1,8 +1,8 @@
 model_to_use: xgboost_baseline
 columns:
   target: 'percentage_docks_available'
-  useful: ['month', 'day', 'hour', 'ctx-4', 'ctx-3', 'ctx-2', 'ctx-1', 'lat', 'lon', 'altitude']
-  categorical: ['month', 'day', 'hour']
+  useful: ['month', 'day', 'hour', 'ctx-4', 'ctx-3', 'ctx-2', 'ctx-1', 'lat', 'lon', 'altitude', 'icon', 'humidity', 'windspeed', 'precip', 'temp']
+  categorical: ['month', 'day', 'hour', icon]
 
 preprocessing:
   bicing_cols: 
@@ -19,27 +19,43 @@ preprocessing:
     - 'lon'
     - 'capacity'
     - 'altitude'
+  meteo_cols:
+    - 'year'
+    - 'month'
+    - 'day'
+    - 'hour'
+    - 'temp'
+    - 'humidity'
+    - 'windspeed'
+    - 'precip'
+    - 'icon'
   use_meteo_data: True
+  use_test: True
   fetch_data: True
   save_file: True
-  output_name: bicing_dataset.csv
-
+  output_name_train: train_dataset.csv
+  output_name_sub: sub_dataset.csv
 train:
   mlflow:
     tracking_uri: 'http://127.0.0.1:5000'
-    mlflow_experiment: 'test_experiment'
-    mlflow_run: 'test_run'
+    mlflow_experiment: 'xgboost'
+    mlflow_run: 'cat_with_tuning'
   tuning: 
     mode: 'standard' # can be standard or custom. If custom, create a new class inheriting from BaseModelTrainer and write a custom train method
     strategy: random # can be either random or grid
-    n_iter: 2 # Only necessary for random strategy
+    n_iter: 100 # Only necessary for random strategy
     parameters:
-      model__max_depth: [3]
-      
+      model__max_depth: [3,5,7]
+      model__learning_rate: [0.01, 0.05,0.1,0.3]
+      model__lambda: [0, 0.5, 1]
+      model__alpha: [0, 0.5, 1]
+      model__colsample_bytree: [0.8, 0.9, 1]
+      model__gamma: [0, 0.5, 1]
+
     
 pipeline:
-  preprocess: False
-  train: True
+  preprocess: True
+  train: False
   
 
     

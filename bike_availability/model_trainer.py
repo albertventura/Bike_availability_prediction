@@ -98,14 +98,12 @@ class ModelTrainerBase:
         best_path = self.train_paths['best_model_path']
         model_path = self.train_paths['models_path']
         transformers_path = self.train_paths['transformers_path']
-        print("THIS MODEL IS BEST?", is_best)
         best_files = os.listdir(best_path)
-        print("CURRENTLY IN BEST_FILES THERE IS: ",best_files)
+
         if is_best:
             #if the list is not empty move the models and transformers to the other directory
             if best_files:
                 for file in best_files:
-                    print(file.split('_')[0])
                     if file.split('_')[0] == 'model':
                         shutil.move(
                             Path.joinpath(best_path, file),
@@ -118,10 +116,10 @@ class ModelTrainerBase:
                             )
                     else:
                         raise ValueError('File should contain either model or transformer at the start')
-                logger.info(f"artifacts saved to {best_path}")
-                joblib.dump(self.model, Path.joinpath(best_path, self.model_name + '.pkl'))
-                if self.transformer:
-                    joblib.dump(self.transformer, Path.joinpath(best_path, self.transformer_name + '.pkl'))
+            logger.info(f"artifacts saved to {best_path}")
+            joblib.dump(self.model, Path.joinpath(best_path, self.model_name + '.pkl'))
+            if self.transformer:
+                joblib.dump(self.transformer, Path.joinpath(best_path, self.transformer_name + '.pkl'))
 
         else:
             logger.info(f"model saved to {model_path}")
@@ -139,6 +137,9 @@ class ModelTrainerBase:
         X_test = data[data.year == 2022].copy()
         y_train = X_train.pop(TARGET)
         y_test = X_test.pop(TARGET)
+        #Making sure order is correct
+        X_train = X_train[USEFUL_COLS]
+        X_test = X_test[USEFUL_COLS]
 
         logger.info(f"Starting Mlflow local server at: {self.mlflow_config.get('tracking_uri')}")
 
@@ -149,17 +150,19 @@ class ModelTrainerBase:
                 
                 
                 if self.transformer:
+                    best_params = {k.split('__')[1]:v for k, v in report['best_params'].items()}
                     estimator = Pipeline([
                         ('transformer', self.transformer),
                         ('model', self.model.set_params(**best_params))
                     ])
-                    best_params = {k.split('__')[1]:v for k, v in report['best_params'].items()}
+                    
                 else:
                     X_train = X_train[USEFUL_COLS]
                     X_test = X_test[USEFUL_COLS]
-
-                    estimator = self.model
                     best_params = report['best_params']
+                    estimator = self.model
+                    estimator.set_params(**best_params)
+                    
 
                 estimator.fit(X_train, y_train)
                 preds = estimator.predict(X_test)

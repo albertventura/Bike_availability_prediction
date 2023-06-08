@@ -1,11 +1,12 @@
 data_paths:
   bicing_data: 'ROOT/data/raw_data'
-  meteo_data: 'ROOT/data/meteo_data'
-  submission_data: 'ROOT/data/submission_data'
+  meteo_data_train: 'ROOT/data/meteo_data/train_meteo_data.csv'
+  meteo_data_test: 'ROOT/data/meteo_data/test_meteo_data.csv'
+  submission_data: 'ROOT/data/submission_data/metadata_sample_submission.csv'
   processed_data: 'ROOT/datasets/'
   stations_to_use_path: 'ROOT'
   stations_info_path: 'ROOT/station_info.csv'
-
+  clean_train_dataset: 'ROOT/datasets/train_dataset.csv'
 
 trainer_paths:
   best_model_path: 'ROOT/artifacts/best_model'

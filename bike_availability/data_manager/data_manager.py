@@ -69,4 +69,4 @@ class DataManager:
         """Reads file with a station data snapshot that works well with the project data"""
         return pd.read_csv(path_to_file)
 
-data_manager = DataManager()
+data_manager = DataManager()    
