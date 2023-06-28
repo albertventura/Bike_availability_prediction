@@ -15,10 +15,10 @@ from sklearn.linear_model import LinearRegression, Lasso, Ridge
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
-from sklearn.model_selection import TimeSeriesSplit
+from sklearn.model_selection import TimeSeriesSplit, KFold
 from pathlib import Path
 from bike_availability import logger
-import requests
+
 
 #PLEASE FIX THIS LATER
 USEFUL_COLS = conf.get_config('columns')['useful']
@@ -117,21 +117,25 @@ class ModelTrainerBase:
                     else:
                         raise ValueError('File should contain either model or transformer at the start')
             logger.info(f"artifacts saved to {best_path}")
-            joblib.dump(self.model, Path.joinpath(best_path, self.model_name + '.pkl'))
+            self.model_path = Path.joinpath(best_path, self.model_name + '.pkl')
             if self.transformer:
-                joblib.dump(self.transformer, Path.joinpath(best_path, self.transformer_name + '.pkl'))
-
+                self.transformer_path = Path.joinpath(best_path, self.transformer_name + '.pkl')
+                joblib.dump(self.transformer, self.transformer_path) 
         else:
             logger.info(f"model saved to {model_path}")
-            joblib.dump(self.model, Path.joinpath(model_path, self.model_name + '.pkl'))
+            self.model_path = Path.joinpath(model_path, self.model_name + '.pkl')
             if self.transformer:
                 logger.info(f"transformer saved to {transformers_path}")
-                joblib.dump(self.transformer, Path.joinpath(transformers_path, self.transformer_name + '.pkl'))
-                
+                self.transformer_path = Path.joinpath(transformers_path, self.transformer_name + '.pkl')
+                joblib.dump(self.transformer, self.transformer_path) 
+        joblib.dump(self.model, self.model_path)
+               
             
 
     def run(self, data:pd.DataFrame):
 
+        logger.info("Shuffling the dataframe")
+        data = data.sample(frac = 1)
         logger.info('Splitting year 2022 as validation and  2020 and 2021 as training')
         X_train = data[data.year.isin([2020, 2021])].copy()
         X_test = data[data.year == 2022].copy()
@@ -157,6 +161,7 @@ class ModelTrainerBase:
                     ])
                     
                 else:
+                    #Making sure order is correct
                     X_train = X_train[USEFUL_COLS]
                     X_test = X_test[USEFUL_COLS]
                     best_params = report['best_params']
@@ -193,6 +198,8 @@ class ModelTrainerBase:
 
                 self.save_model(self.model_is_best())
 
+                return self.transformer_path, self.model_path
+
             elif self.param_config.get('mode') == 'custom':
                 self.train(data)
 
@@ -212,8 +219,8 @@ class ModelTrainerBase:
             X = X[USEFUL_COLS].copy()
             params = {k.split('__')[1]:v for k, v in self.param_config.get('parameters').items()}
 
-        #forward chaining CV
-        tscv = TimeSeriesSplit(n_splits=5)
+        
+        tscv = KFold(n_splits=5)
         if self.param_config.get('strategy') == 'random':
             tuner = RandomizedSearchCV(
                 estimator, params,

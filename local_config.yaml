@@ -4,9 +4,13 @@ data_paths:
   meteo_data_test: 'ROOT/data/meteo_data/test_meteo_data.csv'
   submission_data: 'ROOT/data/submission_data/metadata_sample_submission.csv'
   processed_data: 'ROOT/datasets/'
+  sample_sub: 'ROOT/data/submission_data/sample_submission.csv'
   stations_to_use_path: 'ROOT'
   stations_info_path: 'ROOT/station_info.csv'
   clean_train_dataset: 'ROOT/datasets/train_dataset.csv'
+  clean_test_dataset: 'ROOT/datasets/sub_dataset.csv'
+  submission_directory: 'ROOT/subs'
+ 
 
 trainer_paths:
   best_model_path: 'ROOT/artifacts/best_model'

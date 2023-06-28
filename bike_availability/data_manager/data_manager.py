@@ -11,11 +11,11 @@ class DataManager:
     """Class that takes care of all data-related things"""
 
     @staticmethod
-    def read_csv(origin:Path):
+    def read_csv(origin:Path, **kwargs):
         """
         Reads data to a pandas dataframe.
         """
-        return pd.read_csv(origin)
+        return pd.read_csv(origin, **kwargs)
 
     @staticmethod
     def save_data(file_path: Path, name: str, data: pd.DataFrame) -> None:

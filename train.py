@@ -4,6 +4,8 @@ from bike_availability.config.config import conf
 from bike_availability.data_manager.data_manager import data_manager
 from bike_availability import logger
 from bike_availability.models.get_model import get_model_from_config
+from bike_availability.predict import PredictPipeline
+import os
 
 USEFUL_COLS = conf.get_config('columns')['useful']
 CATEGORICAL_COLS = conf.get_config('columns')['categorical']
@@ -23,6 +25,4 @@ if conf.get_config('pipeline')['train']:
     transformer, model = get_model_from_config(config=conf)
 
     mt = ModelTrainerBase(transformer=transformer, model=model, config=conf)
-    mt.run(df)
-
-
+    tf_path, model_path = mt.run(df)

@@ -170,5 +170,10 @@ mlruns
 myenv
 logs
 datasets
+templates
+subs
+Notebooks/submissions
+Notebooks/logs
+Notebooks/unused
 #for now
-Notebooks
+

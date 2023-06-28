@@ -1,25 +1,27 @@
-model_to_use: xgboost_baseline
-columns:
+model_to_use: xgboost_simple #model from the models module
+columns: #columns to use, we set the target, the columns to use and of those which are categorical
   target: 'percentage_docks_available'
   useful: ['month', 'day', 'hour', 'ctx-4', 'ctx-3', 'ctx-2', 'ctx-1', 'lat', 'lon', 'altitude', 'icon', 'humidity', 'windspeed', 'precip', 'temp']
-  categorical: ['month', 'day', 'hour', icon]
+  categorical: ['month', 'day', 'hour', 'icon']
 
-preprocessing:
-  bicing_cols: 
+preprocessing: #controls the preprocessing pipeline
+  bicing_cols:  # columns to use from bicing data
     - 'station_id'
     - 'last_reported'
     - 'num_bikes_available'
     - 'is_installed'
     - 'is_renting'
+    - 'status'
 
-  station_cols:
+  station_cols: # columns to use from the station info data
     - 'station_id'
     - 'name'
     - 'lat'
     - 'lon'
     - 'capacity'
     - 'altitude'
-  meteo_cols:
+
+  meteo_cols: # columns to use from meteo data
     - 'year'
     - 'month'
     - 'day'
@@ -35,27 +37,29 @@ preprocessing:
   save_file: True
   output_name_train: train_dataset.csv
   output_name_sub: sub_dataset.csv
-train:
+
+train: #controls the model trainer
   mlflow:
     tracking_uri: 'http://127.0.0.1:5000'
     mlflow_experiment: 'xgboost'
-    mlflow_run: 'cat_with_tuning'
+    mlflow_run: 'full_pipeline_fixed_test'
   tuning: 
     mode: 'standard' # can be standard or custom. If custom, create a new class inheriting from BaseModelTrainer and write a custom train method
     strategy: random # can be either random or grid
-    n_iter: 100 # Only necessary for random strategy
-    parameters:
-      model__max_depth: [3,5,7]
-      model__learning_rate: [0.01, 0.05,0.1,0.3]
-      model__lambda: [0, 0.5, 1]
-      model__alpha: [0, 0.5, 1]
-      model__colsample_bytree: [0.8, 0.9, 1]
-      model__gamma: [0, 0.5, 1]
+    n_iter: 50 # Only necessary for random strategy
+    parameters: # use model__ prefix so that the sklearn pipeline will detect the parameters.
+      model__alpha: [0.4, 0.5, 0.6]
+      model__colsample_bytree: [0.9, 1]
+      model__gamma: [0,0.1]
+      model__lambda: [0.4, 0.5]
+      model__learning_rate: [0.1, 0.2, 0.3]
+      model__max_depth: [6,7,8]
 
     
-pipeline:
+pipeline: # train.py, which pipelines to use
   preprocess: True
-  train: False
+  train: True
+
   
 
     

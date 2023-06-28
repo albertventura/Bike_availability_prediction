@@ -3,6 +3,7 @@ import pandas as pd
 import os
 import pandas as pd
 from pytz import timezone
+import calendar
 from pathlib import Path
 from .config.config import Config
 from .data_manager.data_manager import data_manager
@@ -33,6 +34,15 @@ class ProcessingPipeline:
         #filter columns
         data = data[self.pipeline_config['bicing_cols']]
         
+        #preprocess status col
+        mapper = {
+            'IN_SERVICE': 1,
+            'NOT_IN_SERVICE': 0,
+            'MAINTENANCE': 0,
+            'PLANNED': 0,
+            'END_OF_LIFE': 0
+                    }
+        data['status'] = data.status.map(mapper)
         #process timestamp and engineer datetime features
         data['last_reported'] = pd.to_datetime(data['last_reported'], unit = 's')
         data['last_reported'] = data.last_reported.dt.tz_localize(utc_time)
@@ -42,7 +52,8 @@ class ProcessingPipeline:
         data['day'] = data.last_reported.dt.day
         data['hour'] = data.last_reported.dt.hour
         data['year'] = data.last_reported.dt.year
-   
+        data['dayofweek'] = data.last_reported.dt.dayofweek
+
         #resample data hourly aggregating using the mean
         resampled_data = (
             data.groupby(
@@ -85,6 +96,12 @@ class ProcessingPipeline:
         return data.merge(meteo_data, on = ['year', 'month', 'day', 'hour'], how = 'inner')
 
     def process_test_data(self, data:pd.DataFrame):
+        march_2023_dict = {}
+        for day in range(1, 32):
+            weekday = calendar.weekday(2023, 3, day)
+            march_2023_dict[day] = calendar.day_name[weekday]
+        
+        data['dayofweek'] = data.hour.map(march_2023_dict)
         data['year'] = 2023
         return data
 
@@ -105,11 +122,14 @@ class ProcessingPipeline:
         #processing raw bicing data
         df_bicing_processed = pd.DataFrame()
         logger.info('Processing raw data')
+        logger.info("Parsing datetime data")
+        logger.info("Resampling and creating sequences")
         for file in DATA_FILENAMES:
             df_temp = data_manager.read_csv(Path.joinpath(DATA_PATH, file))
             df_temp = self.preprocess_bicing_file(df_temp)
             df_bicing_processed = pd.concat([df_bicing_processed, df_temp], axis= 0)
         
+        df_bicing_processed = df_bicing_processed.drop_duplicates()
         #merging station_data and selecting stations to use
         logger.info('merging with station_data')
         df_bicing_processed = self.merge_station_data(df_bicing_processed)
@@ -141,10 +161,13 @@ class ProcessingPipeline:
             
             if self.pipeline_config['use_test']:
                 logger.info('Saving processed submission data to file')
+                print(df_sub_processed)
+
                 data_manager.save_data(
                     self.data_paths['processed_data'],
                     self.pipeline_config['output_name_sub'],
                     df_sub_processed)
+                
         return df_bicing_processed
 
 

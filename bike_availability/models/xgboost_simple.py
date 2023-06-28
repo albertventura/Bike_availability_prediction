@@ -15,7 +15,7 @@ class Passthrough(BaseEstimator, TransformerMixin):
         X_ = X.copy()
         return X_[self.cols]
 
-class XgboostBaseline:
+class XgboostSimple:
     def __init__(self, config):
         self.cat_cols = config.get_config('columns')['categorical']
         self.cont_cols = [col for col in config.get_config('columns')['useful'] if col not in self.cat_cols]
