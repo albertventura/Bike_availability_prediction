@@ -43,7 +43,7 @@ class DataManager:
                     if (year == 2019) and (month_name in ['Gener', 'Febrer']):
                         continue
                     os.system(f'curl --location "https://opendata-ajuntament.barcelona.cat/resources/bcn/BicingBCN/{fname}" -o {fname}"')
-                    Archive(Path.joinpath(Path(os.getcwd()),fname)).extractall(Path.joinpath(ROOT_DIR , '/data/raw_data'))
+                    Archive(os.path.join(os.getcwd(), fname)).extractall(ROOT_DIR.joinpath('data', 'raw_data'))
                     os.system(f'del "{year}_{month:02d}_{month_name}_BicingNou_ESTACIONS.7z"')
 
         else:
