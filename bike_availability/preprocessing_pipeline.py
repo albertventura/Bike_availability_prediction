@@ -113,12 +113,12 @@ class ProcessingPipeline:
         """
         logger.info('Starting pipeline execution')
         DATA_PATH = self.data_paths['bicing_data']
-        DATA_FILENAMES = os.listdir(DATA_PATH)
-
+        
         if self.pipeline_config['fetch_data']:
             logger.info('fetching data')
             data_manager.download_data()
-
+        
+        DATA_FILENAMES = os.listdir(DATA_PATH)
         #processing raw bicing data
         df_bicing_processed = pd.DataFrame()
         logger.info('Processing raw data')
