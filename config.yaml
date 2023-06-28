@@ -31,8 +31,8 @@ preprocessing: #controls the preprocessing pipeline
     - 'windspeed'
     - 'precip'
     - 'icon'
-  use_meteo_data: True
-  use_test: True
+  use_meteo_data: False
+  use_test: False
   fetch_data: True
   save_file: True
   output_name_train: train_dataset.csv
@@ -46,7 +46,7 @@ train: #controls the model trainer
   tuning: 
     mode: 'standard' # can be standard or custom. If custom, create a new class inheriting from BaseModelTrainer and write a custom train method
     strategy: random # can be either random or grid
-    n_iter: 50 # Only necessary for random strategy
+    n_iter: 3 # Only necessary for random strategy
     parameters: # use model__ prefix so that the sklearn pipeline will detect the parameters.
       model__alpha: [0.4, 0.5, 0.6]
       model__colsample_bytree: [0.9, 1]
