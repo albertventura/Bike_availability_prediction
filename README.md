@@ -67,11 +67,11 @@ The main module of this project is `bike_availability`, which consists of:
 
 ### Preprocessing Pipeline
 
-The `preprocessing_pipeline.py` contains the PreprocessingPipeline class which is responsible for downloading the data and preprocessing it into a usable dataset. It performs tasks such as data retrieval, cleaning, feature engineering, and data transformation to prepare the data for model training and prediction.
+The `preprocessing_pipeline.py` contains the `PreprocessingPipeline` class which is responsible for downloading the data and preprocessing it into a usable dataset. It performs tasks such as data retrieval, cleaning, feature engineering, and data transformation to prepare the data for model training and prediction.
 
 ### Model Trainer
 
-The `model_trainer.py` contains the ModelTrainer class which focuses on training a model, tuning hyperparameters, and evaluating the model's performance. It utilizes the preprocessed dataset to train simple machine learning models from the `models` module, and uses techniques such as cross-validation and grid search to find the best combination of hyperparameters. The models are evaluated and saved onto the artifacts directory. If the model happens to score the best it will be saved to artifacts/best_model/ and will be served through the REST API.
+The `model_trainer.py` contains the `ModelTrainer` class which focuses on training a model, tuning hyperparameters, and evaluating the model's performance. It utilizes the preprocessed dataset to train simple machine learning models from the `models` module, and uses techniques such as cross-validation and grid search to find the best combination of hyperparameters. The models are evaluated and saved onto the artifacts directory. If the model happens to score the best it will be saved to `artifacts/best_model/` and will be served through the REST API.
 
 In order to use the model trainer you will need to open a mlflow server and set the local url on the `config.yaml` file.
 
@@ -179,11 +179,11 @@ trainer_paths:
 
 ### data_manager
 
-The data_manager module provides the class DataManager which is in charge of performing the loading and storing of the data.
+The data_manager module provides the class `DataManager` which is in charge of performing the loading and storing of the data.
 
 ---------
 
-Other than that we have the train.py and main.py scripts, which are in charge of launching the full pipeline and deploying a REST API to serve the best model respectively.
+Other than that we have the `train.py` and `main.py` scripts, which are in charge of launching the full pipeline and deploying a REST API to serve the best model respectively.
 
 ### train.py
 
