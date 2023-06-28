@@ -12,7 +12,14 @@ predictor = PredictPipeline(conf)
 
 @app.get("/")
 async def root():
-    return {"message":"Hello World"}
+    welcome = {
+    "message": "Welcome to the Bike Availability API",
+    "endpoints": [
+        "/predict",
+        "/docs"]
+    }
+    return welcome
+
 
 @app.post("/predict")
 async def predict(request: PredictionData):

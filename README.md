@@ -190,7 +190,11 @@ Other than that we have the `train.py` and `main.py` scripts, which are in charg
 By running the `train.py` script, the pipeline will sequentially execute the preprocessing steps, train the model, and save the best model for future predictions.
 
 ### main.py
-Serves the best model through a simple REST API. Uses the `PredictPipeline` class to load the best model and make the predictions.
+Serves the best model through a simple REST endpoint using FastApi. The API uses the `PredictPipeline` class to load the best model and make the predictions.
+In order to get the API up and running you can run the following command:
+```bash
+uvicorn main:app
+```
 
 ---------------
 ## Installation
